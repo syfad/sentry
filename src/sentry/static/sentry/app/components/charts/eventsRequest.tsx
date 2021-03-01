@@ -212,7 +212,7 @@ class EventsRequest extends React.PureComponent<EventsRequestProps, EventsReques
 
     if (expired) {
       addErrorMessage(
-        t(name + ' has an invalid date range. Please try a more recent date range.'),
+        t('%s has an invalid date range. Please try a more recent date range.', name),
         {append: true}
       );
 

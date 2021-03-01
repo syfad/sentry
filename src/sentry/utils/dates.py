@@ -118,15 +118,19 @@ def get_rollup_from_request(request, params, default_interval, error, top_events
     return int(interval.total_seconds())
 
 
-def outside_retention(start, end, organization):
+def outside_retention_with_modified_start(start, end, organization):
     """
-    Check if a start-end datetime range falls is outside an
-    organizations retention period.
+    Check if a start-end datetime range is outside an
+    organizations retention period. Returns an updated
+    start datetime if start is out of retention.
     """
     retention = quotas.get_event_retention(organization=organization)
     if not retention:
-        return False
+        return False, start
 
+    # Need to support timezone-aware and naive datetimes since
+    # Snuba API only deals in naive UTC
     now = datetime.utcnow().astimezone(pytz.utc) if start.tzinfo else datetime.utcnow()
     start = max(start, now - timedelta(days=retention))
-    return start > end
+
+    return start > end, start

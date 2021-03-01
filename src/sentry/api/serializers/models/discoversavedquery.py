@@ -2,7 +2,7 @@ from sentry.api.serializers import Serializer, register, serialize
 from sentry.api.serializers.models.user import UserSerializer
 from sentry.constants import ALL_ACCESS_PROJECTS
 from sentry.discover.models import DiscoverSavedQuery
-from sentry.utils.dates import parse_timestamp, outside_retention
+from sentry.utils.dates import parse_timestamp, outside_retention_with_modified_start
 
 
 @register(DiscoverSavedQuery)
@@ -43,7 +43,9 @@ class DiscoverSavedQuerySerializer(Serializer):
         # expire queries that are beyond the retention period
         if "start" in obj.query:
             start, end = parse_timestamp(obj.query["start"]), parse_timestamp(obj.query["end"])
-            data["expired"] = outside_retention(start, end, obj.organization)
+            data["expired"], data["start"] = outside_retention_with_modified_start(
+                start, end, obj.organization
+            )
 
         if obj.query.get("all_projects"):
             data["projects"] = list(ALL_ACCESS_PROJECTS)
