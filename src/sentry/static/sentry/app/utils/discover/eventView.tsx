@@ -242,7 +242,7 @@ class EventView {
   yAxis: string | undefined;
   display: string | undefined;
   interval: string | undefined;
-  expired: boolean | undefined;
+  expired?: boolean;
   createdBy: User | undefined;
   additionalConditions: QueryResults; // This allows views to always add additional conditins to the query to get specific data. It should not show up in the UI unless explicitly called.
 
@@ -260,7 +260,7 @@ class EventView {
     yAxis: string | undefined;
     display: string | undefined;
     interval?: string;
-    expired: boolean | undefined;
+    expired?: boolean;
     createdBy: User | undefined;
     additionalConditions: QueryResults;
   }) {
@@ -314,7 +314,6 @@ class EventView {
       yAxis: decodeScalar(location.query.yAxis),
       display: decodeScalar(location.query.display),
       interval: decodeScalar(location.query.interval),
-      expired: decodeScalar(location.query.expired) === 'true',
       createdBy: undefined,
       additionalConditions: new QueryResults([]),
     });

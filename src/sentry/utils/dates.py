@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 import pytz
 from dateutil.parser import parse
+from sentry import quotas
 from sentry.constants import MAX_ROLLUP_POINTS
 from django.db import connections
 
@@ -115,3 +116,17 @@ def get_rollup_from_request(request, params, default_interval, error, top_events
     if date_range.total_seconds() / interval.total_seconds() > max_rollup_points:
         raise error
     return int(interval.total_seconds())
+
+
+def outside_retention(start, end, organization):
+    """
+    Check if a start-end datetime range falls is outside an
+    organizations retention period.
+    """
+    retention = quotas.get_event_retention(organization=organization)
+    if not retention:
+        return False
+
+    now = datetime.utcnow().astimezone(pytz.utc) if start.tzinfo else datetime.utcnow()
+    start = max(start, now - timedelta(days=retention))
+    return start > end
