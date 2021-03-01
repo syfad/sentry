@@ -14,7 +14,7 @@ import {t} from 'app/locale';
 import space from 'app/styles/space';
 import {Organization, Project} from 'app/types';
 import {BuiltinSymbolSource, DebugFile} from 'app/types/debugFiles';
-import {CandidateDownloadStatus, Image} from 'app/types/debugImage';
+import {CandidateDownloadStatus, Image, ImageStatus} from 'app/types/debugImage';
 import theme from 'app/utils/theme';
 
 import Address from '../address';
@@ -29,7 +29,7 @@ type Props = AsyncComponent['props'] &
   ModalRenderProps & {
     projectId: Project['id'];
     organization: Organization;
-    image?: Image;
+    image?: Image & {status: ImageStatus};
   };
 
 type State = AsyncComponent['state'] & {
@@ -220,7 +220,8 @@ class DebugImageDetails extends AsyncComponent<Props, State> {
     const {Header, Body, Footer, image, organization, projectId} = this.props;
     const {loading, builtinSymbolSources} = this.state;
 
-    const {debug_id, debug_file, code_file, code_id, arch: architecture} = image ?? {};
+    const {debug_id, debug_file, code_file, code_id, arch: architecture, status} =
+      image ?? {};
 
     const candidates = this.getCandidates();
     const baseUrl = this.api.baseUrl;
@@ -270,6 +271,7 @@ class DebugImageDetails extends AsyncComponent<Props, State> {
               </SearchInSettingsAction>
             )}
             <Candidates
+              imageStatus={status}
               candidates={candidates}
               organization={organization}
               projectId={projectId}
